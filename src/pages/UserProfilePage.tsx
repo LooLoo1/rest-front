@@ -35,7 +35,7 @@ const UserProfilePage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+      <div className="min-h-screen flex items-center justify-center bg-[url(/login-bg.png)] text-white">
         <Loader />
       </div>
     );
@@ -51,7 +51,7 @@ const UserProfilePage = () => {
       : (profile.list || []).filter((m) => m.status === activeTab);
 
   return (
-    <div className="min-h-screen bg-black text-white space-y-10 pt-26 p-10">
+    <div className="min-h-screen bg-[url(/login-bg.png)] text-white space-y-10 pt-26 p-10">
       {/* User Info */}
       <section className="bg-[#1e1e1e] rounded-[40px] p-6 max-w-6xl mx-auto space-y-2">
         <h1 className="text-3xl font-bold">{profile.username}</h1>

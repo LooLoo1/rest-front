@@ -62,7 +62,7 @@ const MoviePage = () => {
 
   if (isLoading) {
     return (
-      <div className="h-screen flex justify-center items-center bg-black/70">
+      <div className="h-screen flex justify-center items-center bg-[url(/login-bg.png)]">
         <Loader />
       </div>
     );
@@ -77,7 +77,7 @@ const MoviePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0e0e0e] text-white flex justify-center pt-26 px-4 md:px-20">
+    <div className="min-h-screen bg-[url(/login-bg.png)] text-white flex justify-center pt-26 px-4 md:px-20">
       <div className="bg-[#1f1f1f] rounded-[40px] p-8 md:p-12 flex flex-col md:flex-row gap-10 max-w-6xl w-full shadow-2xl items-center">
         <img
           src={movie.poster}
