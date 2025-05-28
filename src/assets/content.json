@@ -1,0 +1,33 @@
+{
+    "header": {
+      "title": "Welcome to",
+      "highlight": "MOVIECRITIC",
+      "description": "MovieCritic – your trusted destination for insightful film reviews and cinematic analysis. We combine passion for storytelling with critical expertise to guide your viewing choices."
+    },
+    "offers": {
+      "title": "What We Offer",
+      "items": [
+        {
+          "title": "🎬 Comprehensive Film Library",
+          "description": "Browse our extensive collection of films across all genres and eras."
+        },
+        {
+          "title": "🤖 AI-Powered Assistance",
+          "description": "Ask our LLM for personalized recommendations, film trivia, or analysis."
+        },
+        {
+          "title": "📝 Personal Watchlist System",
+          "description": "Save films to watch later and track what you've already seen."
+        },
+        {
+          "title": "📽️ Detailed Film Information",
+          "description": "Access cast details, production facts, running times, and release dates."
+        }
+      ]
+    },
+    "join": {
+      "title": "Join Our Community",
+      "button": "Sign In / Sign Up"
+    }
+  }
+  
