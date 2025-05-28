@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { apiService } from "../services/api/service";
-import type { MovieDTO } from "../services/api/types";
+import type { MovieDTO, Movie } from "../services/api/types";
 
 const MOVIE_STEP = 40;
 
 export const useLazyMovies = (search: string) => {
-  const [movies, setMovies] = useState<MovieDTO[]>([]);
+  const [movies, setMovies] = useState<(Movie | MovieDTO)[]>([]);
   const [limit, setLimit] = useState(MOVIE_STEP);
   const [isLoading, setIsLoading] = useState(false);
   const [isSearchMode, setIsSearchMode] = useState(false);
