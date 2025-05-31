@@ -50,6 +50,10 @@ class ApiService {
     return this._get("/movies/search", { params: { keyword } });
   }
 
+  async getFiveMovies(): Promise<MovieDTO[]> {
+    return this._get("/movies/get-5")
+  }
+
   async getRandomMovie(): Promise<Movie> {
     return this._get("/movies/random");
   }

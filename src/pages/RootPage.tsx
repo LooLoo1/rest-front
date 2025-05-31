@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import content from "../assets/content.json"; 
+import RecentMovies from "../components/RecentMovies";
 
 const HeaderSection = () => (
   <div className="gap-16 flex flex-col items-center text-center px-4">
@@ -55,6 +56,7 @@ const RootPage = () => {
       <div className="max-w-7xl mx-auto flex flex-col gap-32 items-center relative z-10 px-4">
         <HeaderSection />
         <OfferSection />
+        <RecentMovies/>
         <JoinSection onJoin={() => navigate("/login")} />
       </div>
     </div>
