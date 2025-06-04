@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:10000/",
-  // baseURL: "https://project-rest-w38s.onrender.com/",
+  // baseURL: "http://localhost:10000/",
+  baseURL: "https://project-rest-w38s.onrender.com/",
 });
 
 api.interceptors.request.use((config) => {
