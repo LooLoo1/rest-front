@@ -9,6 +9,7 @@ const LLM = () => {
   const [message, setMessage] = useState("");
   const [history, setHistory] = useState<Message[]>([]);
   const containerRef = useRef<HTMLDivElement>(null!);  
+  const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     chatService.getHistory().then((history) => setHistory(history));
@@ -54,9 +55,15 @@ const LLM = () => {
     setHistory([]);
   };
 
+  const handleFloatingButtonClick = (event: React.MouseEvent) => {
+    const rect = (event.target as HTMLElement).getBoundingClientRect();
+    setButtonPosition({ x: rect.right, y: rect.bottom }); // Use bottom-right corner
+    setOpen(true);
+  };
+
   return (
     <>
-      {!open && <FloatingButton onClick={() => setOpen(true)} />}
+      {!open && <FloatingButton onClick={handleFloatingButtonClick} />}
       {open && (
         <ChatWindow
           isLoading={isLoading}
@@ -67,6 +74,7 @@ const LLM = () => {
           input={message}
           setInput={setMessage}
           containerRef={containerRef}
+          initialPosition={buttonPosition}
         />
       )}
     </>

@@ -13,6 +13,7 @@ type Props = {
   isLoading: boolean;
   setInput: (val: string) => void;
   containerRef: React.RefObject<HTMLDivElement>;
+  initialPosition: { x: number; y: number };
 };
 
 const ChatWindow = ({
@@ -24,9 +25,42 @@ const ChatWindow = ({
   setInput,
   isLoading,
   containerRef,
+  initialPosition,
 }: Props) => (
-  <div className="fixed bottom-6 right-6 w-96 max-w-[95vw] h-[70vh] flex flex-col rounded-3xl bg-[#1e1e1e]/80 backdrop-blur-md shadow-2xl border border-white/10 z-50">
-    <div className="flex justify-between items-center px-5 py-3 bg-[#DCB73C] rounded-t-3xl text-black font-bold text-lg">
+<div 
+  className="fixed w-96 h-[70vh] flex flex-col rounded-3xl bg-[#1e1e1e]/80 backdrop-blur-md shadow-2xl border border-white/10 z-50 min-w-[300px] min-h-[400px] max-h-[95vh] max-w-[95vw]"
+  style={{ 
+    resize: 'both',
+    overflow: 'auto', // Ensure resizing works
+    touchAction: 'none',
+    left: `${initialPosition.x - 384}px`, // Adjust for width (96 * 4 = 384px)
+    top: `${initialPosition.y - (0.7 * window.innerHeight)}px`, // Adjust for height (70vh)
+  }}
+>
+    <div
+      className="flex justify-between items-center px-5 py-3 bg-[#DCB73C] rounded-t-3xl text-black font-bold text-lg cursor-move"
+      onMouseDown={(e) => {
+        const el = e.currentTarget.parentElement!;
+        const rect = el.getBoundingClientRect();
+        const offsetX = e.clientX - rect.left;
+        const offsetY = e.clientY - rect.top;
+
+        const onMouseMove = (e: MouseEvent) => {
+          const x = e.clientX - offsetX;
+          const y = e.clientY - offsetY;
+          el.style.left = `${x}px`;
+          el.style.top = `${y}px`;
+        };
+
+        const onMouseUp = () => {
+          document.removeEventListener('mousemove', onMouseMove);
+          document.removeEventListener('mouseup', onMouseUp);
+        };
+
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+      }}
+    >
       <span>🤖 AI Support</span>
       <div className="flex gap-3">
         <DeleteIcon

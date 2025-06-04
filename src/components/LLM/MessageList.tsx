@@ -1,4 +1,5 @@
 import type { Message } from "../../services/llm/chatService";
+import ReactMarkdown from 'react-markdown';
 
 const MessageList = ({
   messages,
@@ -31,7 +32,9 @@ const MessageList = ({
                 : "bg-white/10 text-white border border-white/10 rounded-bl-none"
             }`}
           >
-            {msg.text}
+            <ReactMarkdown>
+              {msg.text}
+            </ReactMarkdown>
           </div>
         </div>
       ))}
