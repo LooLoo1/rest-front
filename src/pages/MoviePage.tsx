@@ -2,16 +2,21 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { apiService } from "../services/api/service";
 import Loader from "../components/Loader";
-import type { Movie } from "../services/api/types";
+import type { Movie, UserProfileDTO, MovieDTO } from "../services/api/types";
 
 const STATUS_TABS = ["planned", "watching", "completed", "dropped", "favourite"] as const;
 
 const MoviePage = () => {
   const { id } = useParams<{ id: string }>();
   const [movie, setMovie] = useState<Movie | null>(null);
+  const [profile, setProfile] = useState<UserProfileDTO | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [userId, setUserId] = useState<number | null>(null);
   const [selectedStatuses, setSelectedStatuses] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    setSelectedStatuses(new Set());
+  }, [id]);
 
   useEffect(() => {
     const fetchMovieAndUser = async () => {
@@ -23,6 +28,12 @@ const MoviePage = () => {
         ]);
         setMovie(movieRes);
         setUserId(userRes.id || 0);
+        setProfile(userRes);
+        
+        const movieStatus = userRes.list?.find(m => (m as MovieDTO).id === id)?.status;
+        if (movieStatus) {
+          setSelectedStatuses(new Set([movieStatus]));
+        }
       } catch (error) {
         console.error("Failed to fetch movie or user:", error);
       } finally {
@@ -34,7 +45,7 @@ const MoviePage = () => {
   }, [id]);
 
   const handleStatusChange = async (status: string) => {
-    if (!userId || !movie?.imdbId) return;
+    if (!userId || !id) return;
 
     const isSelected = selectedStatuses.has(status);
     const updatedStatuses = new Set(selectedStatuses);
@@ -52,11 +63,20 @@ const MoviePage = () => {
       const status = ([...updatedStatuses][0] as typeof STATUS_TABS[number]) || "planned";
       await apiService.setMovieStatus({
         userId,
-        movieId: movie.imdbId,
+        movieId: id,
         status,
       });
+      
+      if (profile) {
+        const updatedList = profile.list?.map(m => 
+          (m as MovieDTO).id === id ? { ...m, status } : m
+        ) || [];
+        setProfile({ ...profile, list: updatedList });
+      }
     } catch (error) {
       console.error("Failed to update movie status:", error);
+      const currentStatus = profile?.list?.find(m => (m as MovieDTO).id === id)?.status;
+      setSelectedStatuses(new Set(currentStatus ? [currentStatus] : []));
     }
   };
 
@@ -115,12 +135,12 @@ const MoviePage = () => {
             <h2 className="text-xl font-semibold mb-2">Watchlist Status</h2>
             <div className="flex flex-wrap gap-2">
               {STATUS_TABS.map((status) => (
-                <label key={status} className="flex items-center gap-2 text-sm bg-white/5 px-3 py-1 rounded-full cursor-pointer">
+                <label key={status} className="flex items-center gap-2 text-sm bg-white/5 px-3 py-1 rounded-full cursor-pointer hover:bg-white/10 transition-colors">
                   <input
                     type="checkbox"
                     checked={selectedStatuses.has(status)}
                     onChange={() => handleStatusChange(status)}
-                    className="accent-yellow-500"
+                    className="accent-[#DCB73C]"
                   />
                   {status.charAt(0).toUpperCase() + status.slice(1)}
                 </label>
