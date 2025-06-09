@@ -13,6 +13,7 @@ const MoviePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [userId, setUserId] = useState<number | null>(null);
   const [selectedStatuses, setSelectedStatuses] = useState<Set<string>>(new Set());
+  const [loadingStatus, setLoadingStatus] = useState<string | null>(null);
 
   useEffect(() => {
     setSelectedStatuses(new Set());
@@ -49,34 +50,40 @@ const MoviePage = () => {
 
     const isSelected = selectedStatuses.has(status);
     const updatedStatuses = new Set(selectedStatuses);
-
-    if (isSelected) {
-      updatedStatuses.delete(status);
-    } else {
-      updatedStatuses.clear(); // allow only one active
-      updatedStatuses.add(status);
-    }
-
-    setSelectedStatuses(updatedStatuses);
+    setLoadingStatus(status);
 
     try {
-      const status = ([...updatedStatuses][0] as typeof STATUS_TABS[number]) || "planned";
-      await apiService.setMovieStatus({
-        userId,
-        movieId: id,
-        status,
-      });
-      
-      if (profile) {
-        const updatedList = profile.list?.map(m => 
-          (m as MovieDTO).id === id ? { ...m, status } : m
-        ) || [];
-        setProfile({ ...profile, list: updatedList });
+      if (isSelected) {
+        await apiService.removeMovieStatus(userId, id);
+        updatedStatuses.delete(status);
+        if (profile) {
+          const updatedList = profile.list?.filter(m => (m as MovieDTO).id !== id) || [];
+          setProfile({ ...profile, list: updatedList });
+        }
+      } else {
+        updatedStatuses.clear(); // allow only one active
+        updatedStatuses.add(status);
+        const newStatus = status as typeof STATUS_TABS[number];
+        await apiService.setMovieStatus({
+          userId,
+          movieId: id,
+          status: newStatus,
+        });
+        
+        if (profile) {
+          const updatedList = profile.list?.filter(m => (m as MovieDTO).id !== id) || [];
+          updatedList.push({ id, status: newStatus } as MovieDTO);
+          setProfile({ ...profile, list: updatedList });
+        }
       }
+      setSelectedStatuses(updatedStatuses);
     } catch (error) {
       console.error("Failed to update movie status:", error);
+      // Revert to previous state on error
       const currentStatus = profile?.list?.find(m => (m as MovieDTO).id === id)?.status;
       setSelectedStatuses(new Set(currentStatus ? [currentStatus] : []));
+    } finally {
+      setLoadingStatus(null);
     }
   };
 
@@ -135,14 +142,30 @@ const MoviePage = () => {
             <h2 className="text-xl font-semibold mb-2">Watchlist Status</h2>
             <div className="flex flex-wrap gap-2">
               {STATUS_TABS.map((status) => (
-                <label key={status} className="flex items-center gap-2 text-sm bg-white/5 px-3 py-1 rounded-full cursor-pointer hover:bg-white/10 transition-colors">
+                <label 
+                  key={status} 
+                  className={`flex items-center gap-2 text-sm bg-white/5 px-3 py-1 rounded-full cursor-pointer hover:bg-white/10 transition-colors ${
+                    loadingStatus === status ? 'opacity-50 pointer-events-none' : ''
+                  }`}
+                >
                   <input
                     type="checkbox"
                     checked={selectedStatuses.has(status)}
                     onChange={() => handleStatusChange(status)}
                     className="accent-[#DCB73C]"
+                    disabled={loadingStatus === status}
                   />
-                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                  {loadingStatus === status ? (
+                    <span className="flex items-center gap-2">
+                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Updating...
+                    </span>
+                  ) : (
+                    status.charAt(0).toUpperCase() + status.slice(1)
+                  )}
                 </label>
               ))}
             </div>

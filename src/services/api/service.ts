@@ -62,6 +62,10 @@ class ApiService {
     return this._post("/status/add", data);
   }
 
+  async removeMovieStatus(userId: number, movieId: string): Promise<void> {
+    return this._delete("/status/remove", { params: { userid: userId, movieId } });
+  }
+
   // ===================
   // 🤖 AI Chat
   // ===================
@@ -83,6 +87,11 @@ class ApiService {
 
   private async _post<T = unknown>(url: string, data?: unknown, config?: object): Promise<T> {
     const response = await axiosInstance.post<T>(url, data, config);
+    return response.data;
+  }
+
+  private async _delete<T = unknown>(url: string, config?: object): Promise<T> {
+    const response = await axiosInstance.delete<T>(url, config);
     return response.data;
   }
 }
